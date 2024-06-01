@@ -21,4 +21,19 @@ userController.createUser = async (req, res) => {
     }
 };
 
+userController.getUser = async (req, res) => {
+    try {
+        const { userId } = req;
+        const user = await User.findOne({ userId }); // MongoDB를 가정하여 _id 필드로 검색
+
+        if (!user) {
+            throw new Error("사용자를 찾을 수 없습니다.");
+        }
+
+        res.status(200).json({ status: "success", user });
+    } catch (error) {
+        res.status(400).json({ status: "fail", message: error.message });
+    }
+};
+
 module.exports = userController;
