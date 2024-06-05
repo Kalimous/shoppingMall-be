@@ -44,4 +44,30 @@ authController.authenticate = async (req, res, next) => {
     }
 };
 
+authController.checkAdminPermission = async (req, res, next) => {
+    try {
+        const { userId } = req;
+        const user = await User.findById(userId);
+        if (user.level !== "admin") {
+            throw new Error("권한이 없습니다.");
+        }
+        next();
+    } catch (error) {
+        res.status(400).json({ status: "fail", message: error.message });
+    }
+};
+
+authController.promiteToAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findById(id);
+        if (!user) throw new Error("유저를 찾을 수 없습니다.");
+        user.level = "admin";
+        await user.save();
+        res.status(200).json({ status: "success", user });
+    } catch (error) {
+        res.status(400).json({ status: "fail", message: error.message });
+    }
+};
+
 module.exports = authController;

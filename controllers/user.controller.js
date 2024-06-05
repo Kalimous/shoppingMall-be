@@ -24,7 +24,7 @@ userController.createUser = async (req, res) => {
 userController.getUser = async (req, res) => {
     try {
         const { userId } = req;
-        const user = await User.findOne({ userId }); // MongoDB를 가정하여 _id 필드로 검색
+        const user = await User.findById(userId);
 
         if (!user) {
             throw new Error("사용자를 찾을 수 없습니다.");
