@@ -36,7 +36,10 @@ productController.createProduct = async (req, res) => {
 productController.getProducts = async (req, res) => {
     try {
         const { page = 1, name } = req.query;
-        const cond = name ? { name: { $regex: name, $options: "i" } } : {};
+        const cond = {
+            isDeleted: false, // isDelete 필드가 false인 상품만 필터링
+            ...(name && { name: { $regex: name, $options: "i" } }), // 이름 필터링 조건 추가
+        };
 
         let query = Product.find(cond);
 
@@ -55,7 +58,7 @@ productController.getProducts = async (req, res) => {
             data: productList,
         };
 
-        console.log("r", response);
+        response ? console.log(response) : console.log("nothing");
 
         res.status(200).json(response);
     } catch (error) {
@@ -63,6 +66,67 @@ productController.getProducts = async (req, res) => {
     }
 };
 
-module.exports = productController;
+productController.updateProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const {
+            sku,
+            name,
+            size,
+            image,
+            price,
+            description,
+            category,
+            stock,
+            status,
+        } = req.body;
+        const product = await Product.findByIdAndUpdate(
+            { _id: productId },
+            {
+                sku,
+                name,
+                size,
+                image,
+                price,
+                description,
+                category,
+                stock,
+                status,
+            },
+            { new: true }
+        );
+
+        if (!product) throw new Error("상품을 찾을 수 없습니다.");
+        res.status(200).json({ stauts: "success", data: product });
+    } catch (error) {
+        res.status(400).json({ status: "fail", message: error.message });
+    }
+};
+
+productController.deleteProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const product = await Product.findByIdAndUpdate(
+            { _id: productId },
+            { isDeleted: true },
+            { new: true }
+        );
+        if (!product) throw new Error("상품을 찾을 수 없습니다.");
+        res.status(200).json({ stauts: "success", data: product });
+    } catch (error) {
+        res.status(400).json({ status: "fail", message: error.message });
+    }
+};
+
+productController.getSelectProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const product = await Product.findById({ _id: productId });
+        if (!product) throw new Error("상품을 찾을 수 없습니다.");
+        res.status(200).json({ stauts: "success", data: product });
+    } catch (error) {
+        res.status(400).json({ status: "fail", message: error.message });
+    }
+};
 
 module.exports = productController;
