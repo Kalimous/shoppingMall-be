@@ -1,6 +1,6 @@
 const productController = {};
 const Product = require("../model/Product");
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 productController.createProduct = async (req, res) => {
     try {
@@ -57,8 +57,6 @@ productController.getProducts = async (req, res) => {
             totalPageNum,
             data: productList,
         };
-
-        response ? console.log(response) : console.log("nothing");
 
         res.status(200).json(response);
     } catch (error) {
