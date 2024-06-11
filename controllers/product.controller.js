@@ -140,8 +140,10 @@ productController.checkStock = async(item) => {
         product.stock=newStock
 
         await product.save()
+
+        return {isVerify : true}
     } catch(error) {
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail2", message: error.message });
     }
 }
 
@@ -160,7 +162,7 @@ productController.checkItemListStock = async(itemList, res, req) => {
         return insufficientStockItems
         
     } catch(error) {
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail3", message: error.message });
     }
 }
 

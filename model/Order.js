@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const Product = required("./Product");
-const User = required("./User.js");
+const Product = require("./Product");
+const User = require("./User.js");
 const Schema = mongoose.Schema;
 const OrderSchema = Schema(
     {
