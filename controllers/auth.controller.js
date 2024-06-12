@@ -22,7 +22,7 @@ authController.loginWithEmail = async (req, res) => {
             throw new Error("잘못된 이메일 또는 비밀번호입니다.");
         }
     } catch (error) {
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail1", message: error.message });
     }
 };
 
@@ -40,7 +40,7 @@ authController.authenticate = async (req, res, next) => {
         });
         next();
     } catch (error) {
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail2", message: error.message });
     }
 };
 
@@ -53,7 +53,7 @@ authController.checkAdminPermission = async (req, res, next) => {
         }
         next();
     } catch (error) {
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail3", message: error.message });
     }
 };
 
@@ -66,7 +66,7 @@ authController.promiteToAdmin = async (req, res) => {
         await user.save();
         res.status(200).json({ status: "success", user });
     } catch (error) {
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail4", message: error.message });
     }
 };
 

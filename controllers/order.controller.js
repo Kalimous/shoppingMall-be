@@ -4,7 +4,7 @@ const Order = require("../model/Order");
 const mongoose = require("mongoose");
 
 const orderController = {};
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 orderController.createOrder = async (req, res) => {
     try {
@@ -38,34 +38,39 @@ orderController.createOrder = async (req, res) => {
             orderNum: newOrder.orderNum,
         });
     } catch (error) {
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail1", message: error.message });
     }
 };
 
-orderController.getOrder = async (req, res) => {
+orderController.getOrders = async (req, res) => {
     try {
-        const { page = 1, ordernum } = req.query;
-
+        const { page = 1, orderNum } = req.query;
+        console.log(page, orderNum);
         const cond = {
-            ...(ordernum && { ordernum: { $regex: ordernum, $options: "i" } }),
+            ...(orderNum && { orderNum: { $regex: orderNum, $options: "i" } }), // orderNum 필터링 조건 추가
         };
 
-        let query = await Order.find(cond);
+        const totalItemNum = await Order.find(cond).countDocuments();
+        const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
 
-        console.log(query);
-
-        // console.log(query);
-        const { userId } = req; // userId는 req 객체에서 가져옵니다.
-        const orders = await Order.find({ userId })
-            .populate("items.productId")
+        const orderList = await Order.find(cond)
+            .skip((page - 1) * PAGE_SIZE)
+            .limit(PAGE_SIZE)
             .populate("userId")
+            .populate("items.productId")
             .exec();
-        res.status(200).json({ status: "success", orders });
+
+        const response = {
+            status: "success",
+            totalPageNum,
+            data: orderList,
+        };
+
+        res.status(200).json(response);
     } catch (error) {
         res.status(400).json({ status: "fail", message: error.message });
     }
 };
-
 orderController.updateOrder = async (req, res) => {
     try {
         const { userId } = req;
@@ -90,7 +95,7 @@ orderController.updateOrder = async (req, res) => {
         res.status(200).json({ status: "success", order });
     } catch (error) {
         console.error(error);
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail3", message: error.message });
     }
 };
 

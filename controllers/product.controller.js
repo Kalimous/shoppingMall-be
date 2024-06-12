@@ -1,6 +1,6 @@
 const productController = {};
 const Product = require("../model/Product");
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 productController.createProduct = async (req, res) => {
     try {
@@ -29,29 +29,26 @@ productController.createProduct = async (req, res) => {
         await product.save();
         res.status(200).json({ status: "success", product });
     } catch (error) {
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail1", message: error.message });
     }
 };
 
 productController.getProducts = async (req, res) => {
     try {
-        const { page = 1, ordernum } = req.query;
-        console.log(page, ordernum);
+        const { page = 1, name } = req.query;
+        console.log(page, name);
         const cond = {
-            isDeleted: false, // isDelete 필드가 false인 상품만 필터링
+            isDeleted: false, // isDeleted 필드가 false인 상품만 필터링
             ...(name && { name: { $regex: name, $options: "i" } }), // 이름 필터링 조건 추가
         };
-
-        let query = await Product.find(cond);
-
-        if (page) {
-            query = query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
-        }
 
         const totalItemNum = await Product.find(cond).countDocuments();
         const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
 
-        const productList = await query.exec();
+        const productList = await Product.find(cond)
+            .skip((page - 1) * PAGE_SIZE)
+            .limit(PAGE_SIZE)
+            .exec();
 
         const response = {
             status: "success",
@@ -98,7 +95,7 @@ productController.updateProduct = async (req, res) => {
         if (!product) throw new Error("상품을 찾을 수 없습니다.");
         res.status(200).json({ stauts: "success", data: product });
     } catch (error) {
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail3", message: error.message });
     }
 };
 
@@ -113,7 +110,7 @@ productController.deleteProduct = async (req, res) => {
         if (!product) throw new Error("상품을 찾을 수 없습니다.");
         res.status(200).json({ stauts: "success", data: product });
     } catch (error) {
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail4", message: error.message });
     }
 };
 
@@ -124,7 +121,7 @@ productController.getSelectProduct = async (req, res) => {
         if (!product) throw new Error("상품을 찾을 수 없습니다.");
         res.status(200).json({ stauts: "success", data: product });
     } catch (error) {
-        res.status(400).json({ status: "fail", message: error.message });
+        res.status(400).json({ status: "fail5", message: error.message });
     }
 };
 
@@ -147,7 +144,7 @@ productController.checkStock = async (item) => {
 
         return { isVerify: true };
     } catch (error) {
-        res.status(400).json({ status: "fail2", message: error.message });
+        res.status(400).json({ status: "fail6", message: error.message });
     }
 };
 
@@ -168,7 +165,7 @@ productController.checkItemListStock = async (itemList, res, req) => {
         );
         return insufficientStockItems;
     } catch (error) {
-        res.status(400).json({ status: "fail3", message: error.message });
+        res.status(400).json({ status: "fail7", message: error.message });
     }
 };
 

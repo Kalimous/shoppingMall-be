@@ -92,30 +92,30 @@ cartController.deleteCartItem = async (req, res) => {
     }
 };
 
-cartController.setItemQty = async(req, res) => {
+cartController.setItemQty = async (req, res) => {
     try {
-        const {userId} = req;
-        const {id, qty} = req.body;
-        const cart = await Cart.findOne({userId: userId})
+        const { userId } = req;
+        const { id, qty } = req.body;
+        const cart = await Cart.findOne({ userId: userId });
 
         if (!cart) {
             throw new Error("카트가 없습니다");
         }
 
         cart.items.map((item, index) => {
-            console.log(item._id, id)
-            if(item._id.toString() === id) {
-                item.qty = parseInt(qty)
+            console.log(item._id, id);
+            if (item._id.toString() === id) {
+                item.qty = parseInt(qty);
             }
-        })
+        });
 
-        await cart.save()
+        await cart.save();
 
-        res.json({id, data: cart.items})
-    } catch(error) {
+        res.json({ id, data: cart.items });
+    } catch (error) {
         res.status(400).json({ status: "fail", message: error.message });
     }
-}
+};
 
 module.exports = cartController;
 
