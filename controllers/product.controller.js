@@ -35,13 +35,14 @@ productController.createProduct = async (req, res) => {
 
 productController.getProducts = async (req, res) => {
     try {
-        const { page = 1, name } = req.query;
+        const { page = 1, ordernum } = req.query;
+        console.log(page, ordernum);
         const cond = {
             isDeleted: false, // isDelete 필드가 false인 상품만 필터링
             ...(name && { name: { $regex: name, $options: "i" } }), // 이름 필터링 조건 추가
         };
 
-        let query = Product.find(cond);
+        let query = await Product.find(cond);
 
         if (page) {
             query = query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
@@ -127,43 +128,48 @@ productController.getSelectProduct = async (req, res) => {
     }
 };
 
-productController.checkStock = async(item) => {
+productController.checkStock = async (item) => {
     try {
-        const product = await Product.findById(item.productId)
+        const product = await Product.findById(item.productId);
 
         if (product.stock[item.size] < item.qty) {
-            return {isVerify: false, message: `${product.name}의 ${item.size}재고가 부족합니다.`}
+            return {
+                isVerify: false,
+                message: `${product.name}의 ${item.size}재고가 부족합니다.`,
+            };
         }
 
-        const newStock = {...product.stock}
+        const newStock = { ...product.stock };
         newStock[item.size] -= item.qty;
-        product.stock=newStock
+        product.stock = newStock;
 
-        await product.save()
+        await product.save();
 
-        return {isVerify : true}
-    } catch(error) {
+        return { isVerify: true };
+    } catch (error) {
         res.status(400).json({ status: "fail2", message: error.message });
     }
-}
+};
 
-productController.checkItemListStock = async(itemList, res, req) => {
+productController.checkItemListStock = async (itemList, res, req) => {
     try {
-        const insufficientStockItems = []
+        const insufficientStockItems = [];
         await Promise.all(
             itemList.map(async (item) => {
-                const stockCheck = await productController.checkStock(item)
-                if(!stockCheck.isVerify) {
-                    insufficientStockItems.push({item, message: stockCheck.message})
+                const stockCheck = await productController.checkStock(item);
+                if (!stockCheck.isVerify) {
+                    insufficientStockItems.push({
+                        item,
+                        message: stockCheck.message,
+                    });
                 }
-                return stockCheck
+                return stockCheck;
             })
-        )
-        return insufficientStockItems
-        
-    } catch(error) {
+        );
+        return insufficientStockItems;
+    } catch (error) {
         res.status(400).json({ status: "fail3", message: error.message });
     }
-}
+};
 
 module.exports = productController;
