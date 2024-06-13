@@ -86,8 +86,6 @@ orderController.updateOrder = async (req, res) => {
             { new: true, runValidators: true }
         ).populate("items.productId");
 
-        console.log(order);
-
         if (!order) {
             throw new Error("주문이 존재하지 않습니다");
         }
@@ -96,6 +94,22 @@ orderController.updateOrder = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(400).json({ status: "fail3", message: error.message });
+    }
+};
+
+orderController.getMyOrder = async (req, res) => {
+    try {
+        const { userId } = req;
+        const orders = await Order.find({ userId: userId })
+            .populate("items.productId")
+            .populate("userId");
+        console.log(orders);
+        if (!orders || orders.length === 0) {
+            throw new Error("주문이 존재하지 않습니다");
+        }
+        res.status(200).json({ status: "success", orders });
+    } catch (error) {
+        res.status(400).json({ status: "fail", message: error.message });
     }
 };
 
