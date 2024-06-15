@@ -55,6 +55,10 @@ const OrderSchema = new Schema(
                 },
             },
         ],
+        isWriteReview: {
+            type: Boolean,
+            default: false
+        }
     },
     { timestamps: true }
 );

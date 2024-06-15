@@ -45,7 +45,6 @@ orderController.createOrder = async (req, res) => {
 orderController.getOrders = async (req, res) => {
     try {
         const { page = 1, orderNum } = req.query;
-        console.log(page, orderNum);
         const cond = {
             ...(orderNum && { orderNum: { $regex: orderNum, $options: "i" } }), // orderNum 필터링 조건 추가
         };

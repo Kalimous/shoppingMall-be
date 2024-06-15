@@ -36,7 +36,14 @@ productController.createProduct = async (req, res) => {
 productController.getProducts = async (req, res) => {
     try {
         const { page = 1, name } = req.query;
-        console.log(page, name);
+
+        if(!name) {
+            const products = await Product.find({})
+            if(!products) throw new Error('상품이 존재하지 않습니다')
+            res.status(200).json({status: 'success', data: products})
+            return;
+        }
+
         const cond = {
             isDeleted: false, // isDeleted 필드가 false인 상품만 필터링
             ...(name && { name: { $regex: name, $options: "i" } }), // 이름 필터링 조건 추가
